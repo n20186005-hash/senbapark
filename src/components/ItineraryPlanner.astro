@@ -1,0 +1,86 @@
+---
+import { itineraryItems } from '../data/site';
+---
+<section id="itinerary" class="section-shell relative overflow-hidden bg-[#17312a] text-white">
+  <div class="absolute inset-0 opacity-20 soft-grid"></div>
+  <div class="container-page relative grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
+    <div>
+      <span class="section-kicker !text-[#bcd3c8]">行程リスト</span>
+      <h2 class="section-title max-w-xl">今日の行程を、<br />この端末だけに保存。</h2>
+      <p class="max-w-lg text-white/68">気になる場所を選ぶとブラウザの localStorage に保存されます。アカウント登録も通信も不要。別の端末には同期されません。</p>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <span class="tag !border-white/15 !bg-white/8 !text-white/80">サーバー送信なし</span>
+        <span class="tag !border-white/15 !bg-white/8 !text-white/80">現在の端末のみ</span>
+        <span class="tag !border-white/15 !bg-white/8 !text-white/80">いつでも消去可能</span>
+      </div>
+    </div>
+
+    <div class="rounded-[1.7rem] border border-white/12 bg-white/8 p-4 shadow-2xl backdrop-blur-xl sm:p-6" data-itinerary>
+      <div class="mb-5 flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <p class="font-serif text-xl">行きたい場所</p>
+        <p class="text-sm text-white/65"><strong data-selected-count class="text-white">0</strong> / {itineraryItems.length} 件</p>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        {itineraryItems.map((item, index) => (
+          <label class="group flex min-h-28 cursor-pointer gap-3 rounded-2xl border border-white/10 bg-white/7 p-4 transition hover:-translate-y-1 hover:bg-white/12">
+            <input class="peer mt-1 size-5 accent-[#d8a2aa]" type="checkbox" value={item.id} data-itinerary-item />
+            <span>
+              <span class="mb-2 grid size-7 place-items-center rounded-full border border-white/15 text-xs text-white/65 peer-checked:bg-white peer-checked:text-[#17312a]">{String(index + 1).padStart(2, '0')}</span>
+              <span class="block font-bold">{item.title}</span>
+              <span class="mt-1 block text-xs leading-relaxed text-white/55">{item.note}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+      <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
+        <p class="text-xs text-white/50" role="status" aria-live="polite" data-itinerary-status>選択内容は自動保存されます。</p>
+        <button type="button" class="rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-white/75 hover:bg-white/10" data-itinerary-clear>すべて消去</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const STORAGE_KEY = 'senba-itinerary-v1';
+  const root = document.querySelector<HTMLElement>('[data-itinerary]');
+  if (root) {
+    const boxes = Array.from(root.querySelectorAll<HTMLInputElement>('[data-itinerary-item]'));
+    const count = root.querySelector<HTMLElement>('[data-selected-count]');
+    const status = root.querySelector<HTMLElement>('[data-itinerary-status]');
+    const clear = root.querySelector<HTMLButtonElement>('[data-itinerary-clear]');
+
+    const readSaved = (): string[] => {
+      try {
+        const value: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+        return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const updateCount = () => {
+      const selected = boxes.filter((box) => box.checked).map((box) => box.value);
+      if (count) count.textContent = String(selected.length);
+      return selected;
+    };
+
+    const saved = new Set(readSaved());
+    boxes.forEach((box) => { box.checked = saved.has(box.value); });
+    updateCount();
+
+    boxes.forEach((box) => {
+      box.addEventListener('change', () => {
+        const selected = updateCount();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(selected));
+        if (status) status.textContent = 'この端末に保存しました。';
+      });
+    });
+
+    clear?.addEventListener('click', () => {
+      boxes.forEach((box) => { box.checked = false; });
+      localStorage.removeItem(STORAGE_KEY);
+      updateCount();
+      if (status) status.textContent = '保存した行程を消去しました。';
+    });
+  }
+</script>

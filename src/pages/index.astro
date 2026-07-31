@@ -1,0 +1,324 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import ItineraryPlanner from '../components/ItineraryPlanner.astro';
+import MemorialCard from '../components/MemorialCard.astro';
+import { facts, faqItems } from '../data/site';
+
+export const prerender = true;
+
+if (!Astro.site) throw new Error('Astro site configuration is required.');
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const imageUrls = [
+  '/images/senba-hero.jpg',
+  '/images/senba-sakura.jpg',
+  '/images/senba-sunset.jpg',
+].map((path) => new URL(path, Astro.site).href);
+
+const title = '千波公園・千波湖ガイド｜散歩・アクセス・駐車場・周辺案内';
+const description = '水戸駅から歩ける千波公園・千波湖を、散歩コース、アクセス、駐車場、料金、周辺グルメ、偕楽園と組み合わせるモデルコースまで一枚で案内します。';
+
+const attractionSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['TouristAttraction', 'Park'],
+  '@id': `${canonical.href}#attraction`,
+  name: facts.name,
+  alternateName: facts.alternateName,
+  description,
+  url: canonical.href,
+  image: imageUrls,
+  isAccessibleForFree: true,
+  address: {
+    '@type': 'PostalAddress',
+    postalCode: '310-0851',
+    addressRegion: '茨城県',
+    addressLocality: '水戸市',
+    streetAddress: '千波町3080',
+    addressCountry: 'JP',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: facts.latitude,
+    longitude: facts.longitude,
+  },
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: [
+      'https://schema.org/Monday',
+      'https://schema.org/Tuesday',
+      'https://schema.org/Wednesday',
+      'https://schema.org/Thursday',
+      'https://schema.org/Friday',
+      'https://schema.org/Saturday',
+      'https://schema.org/Sunday',
+    ],
+    opens: '00:00',
+    closes: '23:59',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: facts.ratingValue,
+    ratingCount: facts.ratingCount,
+    bestRating: 5,
+    worstRating: 1,
+  },
+  publicAccess: true,
+  amenityFeature: [
+    { '@type': 'LocationFeatureSpecification', name: '湖畔散策路', value: true },
+    { '@type': 'LocationFeatureSpecification', name: '周辺駐車場', value: true },
+    { '@type': 'LocationFeatureSpecification', name: '飲食施設', value: true },
+  ],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  '@id': `${canonical.href}#faq-schema`,
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.answer,
+    },
+  })),
+};
+
+const mapUrl = `https://www.google.com/maps/search/?api=1&query=${facts.latitude},${facts.longitude}`;
+---
+
+<BaseLayout title={title} description={description} structuredData={[attractionSchema, faqSchema]}>
+  <div id="top"></div>
+  <SiteHeader />
+
+  <main id="main-content">
+    <section class="relative min-h-[92svh] overflow-hidden bg-[#17312a] text-white">
+      <picture class="absolute inset-0">
+        <source srcset="/images/senba-hero.webp" type="image/webp" />
+        <img src="/images/senba-hero.jpg" alt="緑に囲まれた千波湖の水辺" class="size-full object-cover object-center" width="2560" height="1920" fetchpriority="high" />
+      </picture>
+      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,35,29,.88)_0%,rgba(12,35,29,.58)_44%,rgba(12,35,29,.18)_74%),linear-gradient(0deg,rgba(12,35,29,.72)_0%,transparent_45%)]"></div>
+      <div class="absolute inset-0 opacity-10 soft-grid"></div>
+
+      <div class="container-page relative flex min-h-[92svh] items-end pb-14 pt-32 sm:pb-20 lg:items-center lg:pb-10">
+        <div class="max-w-4xl reveal">
+          <div class="mb-6 flex flex-wrap items-center gap-3 text-xs font-bold tracking-[.12em] text-white/78">
+            <span class="rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur">水戸駅から歩ける湖畔</span>
+            <span>茨城・水戸</span>
+          </div>
+          <p class="font-serif text-lg tracking-[.2em] text-white/78 sm:text-xl">水戸の日常に、ひらく水辺。</p>
+          <h1 class="mt-3 font-serif text-[clamp(3.6rem,12vw,8.8rem)] leading-[.88] tracking-[-.06em]">千波公園</h1>
+          <p class="mt-5 max-w-2xl text-base leading-8 text-white/76 sm:text-lg">約3kmの湖畔を歩き、白鳥を眺め、夕映えを待つ。偕楽園とまちなかを結ぶ、水戸らしい一日の入口です。</p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a class="btn-primary !border-white !bg-white !text-[#17312a]" href="#guide">過ごし方を選ぶ</a>
+            <a class="btn-secondary !border-white/25 !bg-white/10 !text-white backdrop-blur" href={mapUrl} target="_blank" rel="noopener noreferrer">地図を開く<span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-page relative -mt-5 pb-8 lg:absolute lg:inset-x-0 lg:bottom-4 lg:mt-0">
+        <dl class="grid overflow-hidden rounded-2xl border border-white/15 bg-[#17312a]/66 backdrop-blur-xl sm:grid-cols-4">
+          <div class="border-white/12 p-5 sm:border-r"><dt class="text-[.66rem] font-bold tracking-[.16em] text-white/50">湖畔一周</dt><dd class="mt-1 font-serif text-2xl">{facts.loopDistance}</dd></div>
+          <div class="border-t border-white/12 p-5 sm:border-r sm:border-t-0"><dt class="text-[.66rem] font-bold tracking-[.16em] text-white/50">入園料</dt><dd class="mt-1 font-serif text-2xl">無料</dd></div>
+          <div class="border-t border-white/12 p-5 sm:border-r sm:border-t-0"><dt class="text-[.66rem] font-bold tracking-[.16em] text-white/50">利用時間</dt><dd class="mt-1 font-serif text-2xl">24時間</dd></div>
+          <div class="border-t border-white/12 p-5 sm:border-t-0"><dt class="text-[.66rem] font-bold tracking-[.16em] text-white/50">滞在目安</dt><dd class="mt-1 font-serif text-2xl">{facts.stay}</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section id="guide" class="section-shell overflow-hidden">
+      <div class="container-page">
+        <div class="grid gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-end">
+          <div>
+            <span class="section-kicker">初めての千波湖</span>
+            <h2 class="section-title">湖を中心に、<br />一日の速度を落とす。</h2>
+          </div>
+          <p class="section-lead lg:pb-2">千波公園は「何かを見る」だけでなく、歩く、座る、食べる、季節を感じる時間そのものが魅力。初めてなら湖畔を半周または一周し、気分に合わせて偕楽園や美術館へ足を延ばすのが自然です。</p>
+        </div>
+
+        <div class="mt-12 grid gap-5 lg:grid-cols-3">
+          <article class="surface overflow-hidden lg:col-span-2">
+            <div class="grid h-full md:grid-cols-[1.15fr_.85fr]">
+              <picture class="min-h-72">
+                <source srcset="/images/senba-walk.webp" type="image/webp" />
+                <img src="/images/senba-walk.jpg" alt="千波湖沿いの散策路" class="size-full object-cover" width="960" height="540" loading="lazy" />
+              </picture>
+              <div class="p-7 sm:p-9">
+                <span class="tag">定番</span>
+                <h3 class="mt-5 font-serif text-3xl leading-snug">湖畔ウォーク</h3>
+                <p class="mt-3 text-sm text-[#60716a]">一周約3km。景色を眺めながらゆっくり歩くなら45〜70分ほど。半周でも十分に水辺の空気を味わえます。</p>
+                <ul class="mt-6 space-y-2 text-sm font-bold">
+                  <li>・歩きやすい靴がおすすめ</li>
+                  <li>・ランナーと自転車に配慮</li>
+                  <li>・水分と日差し対策を用意</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="surface p-7 sm:p-9">
+            <span class="tag">写真</span>
+            <h3 class="mt-5 font-serif text-3xl leading-snug">朝と夕方の光</h3>
+            <p class="mt-3 text-sm text-[#60716a]">静かな水面を狙うなら朝。湖面の色と噴水、街の灯りを重ねるなら夕方から日没後が向いています。</p>
+            <div class="mt-8 border-t border-[#17312a]/10 pt-5 text-xs text-[#66756f]">季節・天候・イベントによって景観や混雑は変わります。</div>
+          </article>
+
+          <article class="surface p-7 sm:p-9">
+            <span class="tag">家族</span>
+            <h3 class="mt-5 font-serif text-3xl leading-snug">水辺でゆっくり</h3>
+            <p class="mt-3 text-sm text-[#60716a]">全部を歩かず、ベンチや芝生、カフェ周辺を中心に。子どものペースで短く区切ると無理なく過ごせます。</p>
+          </article>
+
+          <article class="surface overflow-hidden lg:col-span-2">
+            <div class="grid h-full md:grid-cols-[.85fr_1.15fr]">
+              <div class="order-2 p-7 sm:p-9 md:order-1">
+                <span class="tag">季節</span>
+                <h3 class="mt-5 font-serif text-3xl leading-snug">桜と新緑をつなぐ道</h3>
+                <p class="mt-3 text-sm text-[#60716a]">湖畔には多くの桜が並びます。花の時期は早い時間ほど歩きやすく、花後の新緑や冬の澄んだ空気にも別の美しさがあります。</p>
+                <p class="mt-5 text-xs text-[#7b8883]">開花・紅葉の時期は年ごとに変わります。</p>
+              </div>
+              <picture class="order-1 min-h-72 md:order-2">
+                <source srcset="/images/senba-sakura.webp" type="image/webp" />
+                <img src="/images/senba-sakura.jpg" alt="ライトアップされた桜が映える千波湖畔" class="size-full object-cover" width="4000" height="3000" loading="lazy" />
+              </picture>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell bg-[#e9f0ea]">
+      <div class="container-page">
+        <div class="grid gap-10 lg:grid-cols-[.75fr_1.25fr]">
+          <div>
+            <span class="section-kicker">滞在プラン</span>
+            <h2 class="section-title">滞在時間と、<br />おすすめの時間帯。</h2>
+            <p class="section-lead">目的を一つ決めると、広い園内でも迷いません。</p>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <article class="rounded-3xl bg-white/72 p-6 shadow-sm"><p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">約60分</p><h3 class="mt-2 font-serif text-2xl">短時間の湖畔散歩</h3><p class="mt-3 text-sm text-[#60716a]">水戸駅側から湖畔へ入り、景色のよい区間を往復。カフェ休憩を一つ加える程度。</p></article>
+            <article class="rounded-3xl bg-white/72 p-6 shadow-sm"><p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">90〜150分</p><h3 class="mt-2 font-serif text-2xl">一周してゆっくり</h3><p class="mt-3 text-sm text-[#60716a]">一周約3kmに、撮影、ベンチ休憩、軽食を組み合わせる基本プラン。</p></article>
+            <article class="rounded-3xl bg-[#17312a] p-6 text-white shadow-sm"><p class="text-xs font-extrabold tracking-[.15em] text-white/50">早朝</p><h3 class="mt-2 font-serif text-2xl">静けさを楽しむ朝</h3><p class="mt-3 text-sm text-white/65">人の少ない時間に歩きたい人、湖面の反射や鳥を撮りたい人向け。</p></article>
+            <article class="rounded-3xl bg-[#17312a] p-6 text-white shadow-sm"><p class="text-xs font-extrabold tracking-[.15em] text-white/50">夕方</p><h3 class="mt-2 font-serif text-2xl">夕映えを待つ</h3><p class="mt-3 text-sm text-white/65">散歩の終盤を日没前に合わせ、湖面の色が変わる時間をゆっくり過ごす。</p></article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="access" class="section-shell">
+      <div class="container-page">
+        <div class="mb-12 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+          <div><span class="section-kicker">交通・駐車場</span><h2 class="section-title">駅から歩く。<br />車なら余白を持つ。</h2></div>
+          <p class="section-lead">水戸駅から徒歩で向かえるのが千波公園の強みです。週末や花の季節、催しの日は周辺道路と駐車場が混みやすいため、公共交通も選択肢に。</p>
+        </div>
+
+        <div class="grid gap-5 lg:grid-cols-12">
+          <article class="surface p-7 lg:col-span-7 sm:p-9">
+            <div class="flex items-start justify-between gap-5"><div><span class="tag">電車・徒歩</span><h3 class="mt-4 font-serif text-3xl">JR水戸駅から</h3></div><span class="font-serif text-5xl text-[#9caf9f]">01</span></div>
+            <ol class="mt-7 space-y-5 border-l border-[#17312a]/15 pl-6 text-sm">
+              <li><strong class="block text-base">南口から徒歩</strong><span class="text-[#62736d]">駅を出て千波湖方面へ。目安は約15分。天候がよければ最も分かりやすい移動です。</span></li>
+              <li><strong class="block text-base">北口から路線バス</strong><span class="text-[#62736d]">北口6番のりばから千波湖・偕楽園方面へ。降車停留所と運行時刻は当日の案内を確認してください。</span></li>
+            </ol>
+          </article>
+
+          <article class="surface p-7 lg:col-span-5 sm:p-9">
+            <div class="flex items-start justify-between gap-5"><div><span class="tag">車</span><h3 class="mt-4 font-serif text-3xl">高速道路から</h3></div><span class="font-serif text-5xl text-[#9caf9f]">02</span></div>
+            <dl class="mt-7 space-y-4 text-sm"><div class="border-b border-[#17312a]/10 pb-4"><dt class="font-bold">常磐自動車道 水戸IC</dt><dd class="mt-1 text-[#62736d]">一般道でおよそ30分が目安。</dd></div><div><dt class="font-bold">北関東自動車道 水戸南IC</dt><dd class="mt-1 text-[#62736d]">一般道でおよそ20分が目安。</dd></div></dl>
+          </article>
+
+          <article class="rounded-[1.6rem] bg-[#17312a] p-7 text-white lg:col-span-12 sm:p-9">
+            <div class="grid gap-8 lg:grid-cols-[.72fr_1.28fr]">
+              <div><span class="section-kicker !text-[#bcd3c8]">駐車場</span><h3 class="mt-3 font-serif text-4xl">駐車場情報</h3><p class="mt-3 text-sm text-white/62">千波湖西側、偕楽園下など複数の駐車場があります。</p></div>
+              <div class="grid gap-4 sm:grid-cols-3">
+                <div class="rounded-2xl bg-white/8 p-5"><strong class="block">料金</strong><span class="mt-2 block text-sm text-white/60">駐車場ごとに有料・利用条件が異なります。入口表示を確認。</span></div>
+                <div class="rounded-2xl bg-white/8 p-5"><strong class="block">時間</strong><span class="mt-2 block text-sm text-white/60">入出庫できる時間が異なるため、夜間利用は特に確認。</span></div>
+                <div class="rounded-2xl bg-white/8 p-5"><strong class="block">混雑</strong><span class="mt-2 block text-sm text-white/60">桜・梅・大型イベント時は満車を想定し、早めに到着。</span></div>
+              </div>
+            </div>
+            <div class="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6"><p class="text-xs text-white/48">料金・利用時間・交通規制は変更されることがあります。現地表示を優先してください。</p><a href={mapUrl} target="_blank" rel="noopener noreferrer" class="rounded-full border border-white/20 px-5 py-2 text-xs font-bold hover:bg-white/10">周辺地図を確認 ↗</a></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="food" class="section-shell bg-[#f0ebe3]">
+      <div class="container-page">
+        <div class="mb-12 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+          <div><span class="section-kicker">周辺グルメ</span><h2 class="section-title">湖を眺める一皿、<br />水戸を味わう寄り道。</h2></div>
+          <p class="section-lead">園内・湖畔の休憩施設と、水戸駅周辺の店を使い分けると動きやすくなります。営業日や提供内容は各施設の当日案内を確認してください。</p>
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-3">
+          <article class="surface p-7"><span class="text-3xl" aria-hidden="true">☕</span><h3 class="mt-5 font-serif text-2xl">好文cafe周辺</h3><p class="mt-3 text-sm text-[#62736d]">湖畔散歩の途中に立ち寄りやすい休憩地点。景色を眺めながら、飲み物や軽食でひと息。</p><p class="mt-5 text-xs font-bold text-[#7b8883]">混雑時は時間に余裕を。</p></article>
+          <article class="surface p-7"><span class="text-3xl" aria-hidden="true">◌</span><h3 class="mt-5 font-serif text-2xl">みと好文テラス</h3><p class="mt-3 text-sm text-[#62736d]">千波湖西側の複合交流拠点。飲食や物販、屋外空間などを組み合わせて過ごせます。</p><p class="mt-5 text-xs font-bold text-[#7b8883]">店舗ごとに営業時間・休業日が異なります。</p></article>
+          <article class="surface p-7"><span class="text-3xl" aria-hidden="true">◉</span><h3 class="mt-5 font-serif text-2xl">水戸駅で郷土の味</h3><p class="mt-3 text-sm text-[#62736d]">駅周辺なら納豆料理、常陸秋そば、地元食材の店を探しやすく、到着前や帰路にも便利です。</p><p class="mt-5 text-xs font-bold text-[#7b8883]">行列や売り切れを見込み、候補を二つ用意。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="nearby" class="section-shell">
+      <div class="container-page">
+        <div class="mb-10"><span class="section-kicker">千波湖周辺</span><h2 class="section-title">周辺スポットを、<br />一本の散歩に。</h2><p class="section-lead">千波湖だけで終わらせず、目的に合わせて一か所を足すのがおすすめです。</p></div>
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[
+            ['偕楽園', '庭園・梅・水戸の歴史', '自然と歴史を一緒に楽しむ王道。坂道と園内の歩行時間を見込む。'],
+            ['好文亭', '建築・眺望', '偕楽園内の建築。開館状況や入館条件を確認して組み合わせる。'],
+            ['常磐神社', '神社・文化', '偕楽園に隣接。参拝と散策を短時間で組み込みやすい。'],
+            ['茨城県近代美術館', '美術・室内', '天候が不安定な日にも合わせやすい。展覧会と休館日を確認。'],
+            ['茨城県立歴史館', '歴史・庭園', '水戸と茨城の歴史を深く知りたい日に。季節の庭も魅力。'],
+            ['水戸芸術館', '現代美術・音楽', 'まちなかへ移動して文化に触れる。特徴的な塔も目印。'],
+          ].map(([name, tag, text], index) => (
+            <article class="group rounded-3xl border border-[#17312a]/12 bg-white/58 p-6 transition hover:-translate-y-1 hover:bg-white hover:shadow-xl">
+              <div class="flex items-center justify-between"><span class="tag">{tag}</span><span class="font-serif text-2xl text-[#9aaba3]">{String(index + 1).padStart(2, '0')}</span></div>
+              <h3 class="mt-5 font-serif text-2xl">{name}</h3>
+              <p class="mt-3 text-sm text-[#62736d]">{text}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="relative overflow-hidden bg-[#17312a] py-20 text-white sm:py-28">
+      <picture class="absolute inset-0 opacity-[.42]">
+        <source srcset="/images/senba-sunset.webp" type="image/webp" />
+        <img src="/images/senba-sunset.jpg" alt="青空の下に広がる千波湖" class="size-full object-cover" width="1920" height="1080" loading="lazy" />
+      </picture>
+      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(18,48,39,.94),rgba(18,48,39,.54))]"></div>
+      <div class="container-page relative grid gap-10 lg:grid-cols-[.78fr_1.22fr] lg:items-center">
+        <div><span class="section-kicker !text-[#bfd0c8]">入園料</span><h2 class="section-title">入園料・費用</h2></div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="rounded-3xl border border-white/15 bg-white/9 p-6 backdrop-blur"><p class="text-xs font-bold tracking-[.15em] text-white/50">公園入園</p><p class="mt-2 font-serif text-4xl">無料</p><p class="mt-3 text-sm text-white/60">千波公園への入園料はかかりません。</p></div>
+          <div class="rounded-3xl border border-white/15 bg-white/9 p-6 backdrop-blur"><p class="text-xs font-bold tracking-[.15em] text-white/50">別途費用</p><p class="mt-2 font-serif text-2xl">施設・体験は別途</p><p class="mt-3 text-sm text-white/60">飲食、ボート、駐車場、催し、一部周辺施設などは料金が発生する場合があります。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <ItineraryPlanner />
+    <MemorialCard />
+
+    <section id="faq" class="section-shell bg-[#e9f0ea]">
+      <div class="container-page grid gap-10 lg:grid-cols-[.7fr_1.3fr]">
+        <div><span class="section-kicker">よくある質問</span><h2 class="section-title">よくある質問</h2><p class="section-lead">初めての訪問前に、迷いやすい点をまとめました。</p></div>
+        <div class="space-y-3">
+          {faqItems.map((item, index) => (
+            <details class="group rounded-2xl border border-[#17312a]/12 bg-white/68 px-5 py-1 open:bg-white sm:px-7">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-5 py-5 font-bold"><span><span class="mr-3 font-serif text-[#8da095]">{String(index + 1).padStart(2, '0')}</span>{item.question}</span><span class="grid size-7 shrink-0 place-items-center rounded-full border border-[#17312a]/15 transition group-open:rotate-45" aria-hidden="true">＋</span></summary>
+              <p class="border-t border-[#17312a]/10 pb-6 pt-5 text-sm text-[#60716a]">{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-[#102720] py-10 text-white">
+    <div class="container-page grid gap-7 border-b border-white/10 pb-8 sm:grid-cols-[1fr_auto] sm:items-end">
+      <div><p class="font-serif text-2xl">千波公園</p><p class="mt-2 text-xs text-white/50">{facts.address}</p></div>
+      <nav class="flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold text-white/60" aria-label="フッターナビゲーション"><a href="#guide">過ごし方</a><a href="#access">交通・駐車場</a><a href="#food">周辺案内</a><a href="#faq">よくある質問</a></nav>
+    </div>
+    <div class="container-page pt-6 text-xs text-white/42">
+      <p>掲載情報は変わる場合があります。現地案内を優先してください。</p>
+    </div>
+  </footer>
+</BaseLayout>

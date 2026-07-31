@@ -1,0 +1,237 @@
+<section id="card-maker" class="section-shell">
+  <div class="container-page">
+    <div class="mb-10 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+      <div>
+        <span class="section-kicker">旅の記念カード</span>
+        <h2 class="section-title">湖畔の一枚を、<br />旅の記念カードに。</h2>
+      </div>
+      <div>
+        <p class="section-lead">撮影・自撮り・写真ライブラリから選んだ写真を、ブラウザ内の Canvas だけで合成します。写真、入力文字、完成画像はサーバーへ送信されません。</p>
+        <p class="mt-4 inline-flex rounded-full bg-[#e7efe8] px-4 py-2 text-sm font-extrabold text-[#315546]">写真はお使いの端末内だけに保存されます（照片仅保存在您的设备）</p>
+      </div>
+    </div>
+
+    <div class="surface overflow-hidden p-4 sm:p-6 lg:p-8" data-card-maker>
+      <div class="grid gap-8 lg:grid-cols-[380px_1fr]">
+        <div class="space-y-6">
+          <fieldset>
+            <legend class="mb-3 text-sm font-extrabold">1. 写真を選ぶ</legend>
+            <div class="grid grid-cols-3 gap-2">
+              <button class="btn-secondary !min-h-20 !flex-col !rounded-2xl !px-2 !text-xs" type="button" data-trigger="camera"><span class="text-xl">◉</span>撮影</button>
+              <button class="btn-secondary !min-h-20 !flex-col !rounded-2xl !px-2 !text-xs" type="button" data-trigger="selfie"><span class="text-xl">◎</span>自撮り</button>
+              <button class="btn-secondary !min-h-20 !flex-col !rounded-2xl !px-2 !text-xs" type="button" data-trigger="library"><span class="text-xl">▧</span>写真</button>
+            </div>
+            <input hidden type="file" accept="image/*" capture="environment" data-input="camera" />
+            <input hidden type="file" accept="image/*" capture="user" data-input="selfie" />
+            <input hidden type="file" accept="image/*" data-input="library" />
+          </fieldset>
+
+          <fieldset>
+            <legend class="mb-3 text-sm font-extrabold">2. サイズ</legend>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="cursor-pointer rounded-xl border border-[#17312a]/15 bg-white/65 p-3 text-center text-xs font-bold has-[:checked]:border-[#17312a] has-[:checked]:bg-[#e7efe8]"><input class="sr-only" type="radio" name="card-size" value="square" checked />1:1</label>
+              <label class="cursor-pointer rounded-xl border border-[#17312a]/15 bg-white/65 p-3 text-center text-xs font-bold has-[:checked]:border-[#17312a] has-[:checked]:bg-[#e7efe8]"><input class="sr-only" type="radio" name="card-size" value="postcard" />縦型ポストカード</label>
+              <label class="cursor-pointer rounded-xl border border-[#17312a]/15 bg-white/65 p-3 text-center text-xs font-bold has-[:checked]:border-[#17312a] has-[:checked]:bg-[#e7efe8]"><input class="sr-only" type="radio" name="card-size" value="story" />9:16</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend class="mb-3 text-sm font-extrabold">3. 湖畔スタイル</legend>
+            <select class="w-full rounded-xl border border-[#17312a]/15 bg-white px-4 py-3" data-style>
+              <option value="mist">春霞 — 淡い桜色</option>
+              <option value="lake">湖畔ブルー — 静かな青緑</option>
+              <option value="sunset">夕映え — 温かな橙色</option>
+            </select>
+          </fieldset>
+
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            <label class="text-sm font-extrabold">スポット名
+              <input class="mt-2 w-full rounded-xl border border-[#17312a]/15 bg-white px-4 py-3 font-normal" maxlength="24" value="千波公園" data-place />
+            </label>
+            <label class="text-sm font-extrabold">日付
+              <input class="mt-2 w-full rounded-xl border border-[#17312a]/15 bg-white px-4 py-3 font-normal" maxlength="24" data-date />
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <button class="btn-secondary" type="button" data-refresh>プレビュー更新</button>
+            <button class="btn-primary" type="button" data-download disabled>PNGを保存</button>
+          </div>
+          <p class="text-xs leading-relaxed text-[#66756f]" role="status" aria-live="polite" data-card-status>写真を選ぶとプレビューが表示されます。</p>
+        </div>
+
+        <div class="relative grid min-h-[520px] place-items-center overflow-hidden rounded-[1.5rem] bg-[#e8eee9] p-5 soft-grid">
+          <canvas class="max-h-[680px] max-w-full rounded-sm bg-white shadow-2xl" width="1200" height="1200" aria-label="千波公園記念カードのプレビュー" data-canvas></canvas>
+          <div class="pointer-events-none absolute inset-x-6 bottom-6 rounded-full bg-white/80 px-4 py-2 text-center text-xs font-bold text-[#38554a] backdrop-blur" data-privacy-note>ローカル処理のみ・アップロードなし</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  type CardSize = 'square' | 'postcard' | 'story';
+  type CardStyle = 'mist' | 'lake' | 'sunset';
+
+  const maker = document.querySelector<HTMLElement>('[data-card-maker]');
+  if (maker) {
+    const canvas = maker.querySelector<HTMLCanvasElement>('[data-canvas]');
+    const context = canvas?.getContext('2d');
+    const placeInput = maker.querySelector<HTMLInputElement>('[data-place]');
+    const dateInput = maker.querySelector<HTMLInputElement>('[data-date]');
+    const styleInput = maker.querySelector<HTMLSelectElement>('[data-style]');
+    const download = maker.querySelector<HTMLButtonElement>('[data-download]');
+    const refresh = maker.querySelector<HTMLButtonElement>('[data-refresh]');
+    const status = maker.querySelector<HTMLElement>('[data-card-status]');
+    let photo: HTMLImageElement | null = null;
+
+    const formatToday = () => {
+      const now = new Date();
+      return `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+    };
+    if (dateInput) dateInput.value = formatToday();
+
+    const sizes: Record<CardSize, [number, number]> = {
+      square: [1200, 1200],
+      postcard: [1200, 1776],
+      story: [1080, 1920],
+    };
+
+    const getSize = (): CardSize => {
+      const selected = maker.querySelector<HTMLInputElement>('input[name="card-size"]:checked');
+      return (selected?.value as CardSize | undefined) ?? 'square';
+    };
+
+    const getStyle = (): CardStyle => (styleInput?.value as CardStyle | undefined) ?? 'mist';
+
+    const fitCover = (img: HTMLImageElement, width: number, height: number) => {
+      const scale = Math.max(width / img.naturalWidth, height / img.naturalHeight);
+      const sw = width / scale;
+      const sh = height / scale;
+      const sx = (img.naturalWidth - sw) / 2;
+      const sy = (img.naturalHeight - sh) / 2;
+      return { sx, sy, sw, sh };
+    };
+
+    const roundedRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
+      const radius = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, radius);
+    };
+
+    const drawEmpty = () => {
+      if (!canvas || !context) return;
+      const [width, height] = sizes[getSize()];
+      canvas.width = width;
+      canvas.height = height;
+      const gradient = context.createLinearGradient(0, 0, width, height);
+      gradient.addColorStop(0, '#eff4ef');
+      gradient.addColorStop(1, '#dbe8e4');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, width, height);
+      context.fillStyle = '#47675b';
+      context.textAlign = 'center';
+      context.font = `700 ${Math.round(width * .035)}px system-ui, sans-serif`;
+      context.fillText('写真を選んでください', width / 2, height / 2);
+      context.font = `400 ${Math.round(width * .019)}px system-ui, sans-serif`;
+      context.fillText('画像はこの端末内だけで処理されます', width / 2, height / 2 + width * .05);
+    };
+
+    const render = () => {
+      if (!canvas || !context) return;
+      if (!photo) { drawEmpty(); return; }
+      const [width, height] = sizes[getSize()];
+      canvas.width = width;
+      canvas.height = height;
+      const crop = fitCover(photo, width, height);
+      context.clearRect(0, 0, width, height);
+      context.drawImage(photo, crop.sx, crop.sy, crop.sw, crop.sh, 0, 0, width, height);
+
+      const style = getStyle();
+      const colors: Record<CardStyle, [string, string, string]> = {
+        mist: ['rgba(247,220,223,.10)', 'rgba(35,63,54,.60)', '#f4d6dc'],
+        lake: ['rgba(64,127,135,.18)', 'rgba(17,52,50,.70)', '#c9e1dc'],
+        sunset: ['rgba(224,137,91,.18)', 'rgba(59,39,31,.70)', '#ffd2ac'],
+      };
+      const [topColor, bottomColor, accent] = colors[style];
+      const overlay = context.createLinearGradient(0, 0, 0, height);
+      overlay.addColorStop(0, topColor);
+      overlay.addColorStop(.55, 'rgba(0,0,0,0)');
+      overlay.addColorStop(1, bottomColor);
+      context.fillStyle = overlay;
+      context.fillRect(0, 0, width, height);
+
+      const margin = width * .055;
+      context.strokeStyle = 'rgba(255,255,255,.82)';
+      context.lineWidth = Math.max(3, width * .004);
+      roundedRect(context, margin, margin, width - margin * 2, height - margin * 2, width * .018);
+      context.stroke();
+
+      context.textAlign = 'left';
+      context.textBaseline = 'alphabetic';
+      context.fillStyle = '#ffffff';
+      context.shadowColor = 'rgba(0,0,0,.32)';
+      context.shadowBlur = width * .018;
+      context.font = `700 ${Math.round(width * .025)}px system-ui, sans-serif`;
+      context.fillText('水戸・茨城', margin * 1.45, height - margin * 3.25);
+      context.font = `700 ${Math.round(width * .085)}px "Yu Mincho", serif`;
+      context.fillText((placeInput?.value || '千波公園').slice(0, 24), margin * 1.4, height - margin * 1.95);
+      context.fillStyle = accent;
+      context.font = `700 ${Math.round(width * .028)}px system-ui, sans-serif`;
+      context.fillText((dateInput?.value || formatToday()).slice(0, 24), margin * 1.45, height - margin * .95);
+      context.shadowBlur = 0;
+    };
+
+    const loadFile = (file?: File) => {
+      if (!file || !file.type.startsWith('image/')) {
+        if (status) status.textContent = '画像ファイルを選択してください。';
+        return;
+      }
+      if (file.size > 25 * 1024 * 1024) {
+        if (status) status.textContent = '画像が大きすぎます。25MB以下を選んでください。';
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        photo = img;
+        render();
+        if (download) download.disabled = false;
+        if (status) status.textContent = 'プレビューを作成しました。画像はアップロードされていません。';
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        if (status) status.textContent = '画像を読み込めませんでした。別の写真をお試しください。';
+      };
+      img.src = url;
+    };
+
+    maker.querySelectorAll<HTMLButtonElement>('[data-trigger]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = button.dataset.trigger;
+        maker.querySelector<HTMLInputElement>(`[data-input="${target}"]`)?.click();
+      });
+    });
+    maker.querySelectorAll<HTMLInputElement>('[data-input]').forEach((input) => {
+      input.addEventListener('change', () => loadFile(input.files?.[0]));
+    });
+    maker.querySelectorAll<HTMLInputElement>('input[name="card-size"]').forEach((input) => input.addEventListener('change', render));
+    styleInput?.addEventListener('change', render);
+    refresh?.addEventListener('click', render);
+    placeInput?.addEventListener('input', render);
+    dateInput?.addEventListener('input', render);
+
+    download?.addEventListener('click', () => {
+      if (!photo || !canvas) return;
+      render();
+      const link = document.createElement('a');
+      link.download = `senba-memory-${getSize()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      if (status) status.textContent = '記念カードを端末に保存しました。';
+    });
+
+    drawEmpty();
+  }
+</script>
