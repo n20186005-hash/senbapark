@@ -17,7 +17,7 @@
     "audit:lock": "node scripts/audit-lock.mjs",
     "audit:build": "node scripts/audit-build.mjs",
     "verify:clean": "bash scripts/verify-clean.sh",
-    "deploy": "pnpm build && wrangler deploy"
+    "deploy": "pnpm build && node scripts/deploy-with-retry.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.1.7",
