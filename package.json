@@ -1,0 +1,34 @@
+{
+  "name": "senba-park-guide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": "11.18.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "check": "astro check",
+    "build": "astro build",
+    "preview": "astro preview",
+    "audit:source": "node scripts/audit-source.mjs",
+    "audit:lock": "node scripts/audit-lock.mjs",
+    "audit:build": "node scripts/audit-build.mjs",
+    "verify:clean": "bash scripts/verify-clean.sh",
+    "deploy": "pnpm build && wrangler deploy"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "14.1.7",
+    "@astrojs/sitemap": "3.7.3",
+    "astro": "7.1.6"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@tailwindcss/vite": "4.3.3",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "wrangler": "4.116.0"
+  }
+}
