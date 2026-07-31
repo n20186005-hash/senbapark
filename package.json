@@ -17,7 +17,8 @@
     "audit:lock": "node scripts/audit-lock.mjs",
     "audit:build": "node scripts/audit-build.mjs",
     "verify:clean": "bash scripts/verify-clean.sh",
-    "deploy": "pnpm build && node scripts/deploy-with-retry.mjs"
+    "deploy": "pnpm build && node scripts/deploy-with-retry.mjs",
+    "deploy:ci": "pnpm build && sh -c 'n=0; max=3; until [ $n -ge $max ]; do n=$((n+1)); echo \"=== wrangler deploy 尝试 $n/$max ===\"; npx wrangler deploy --force && break; code=$?; echo \"⚠ wrangler deploy 失败(退出 $code)，疑似 Cloudflare API 瞬时 520/521，准备重试\"; [ $n -lt $max ] && sleep $((5 * 2**(n-1))); done; [ $n -lt $max ] || [ -z \"$code\" ]'"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.1.7",
