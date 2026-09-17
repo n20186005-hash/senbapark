@@ -1,15 +1,22 @@
 export const facts = {
   name: '千波公園',
-  alternateName: '千波湖',
+  englishName: 'Senba Park',
+  alternateName: ['千波湖', 'Senba Park'],
   address: '〒310-0851 茨城県水戸市千波町3080',
   latitude: 36.370985,
   longitude: 140.4541765,
   ratingValue: 4.1,
-  ratingCount: 3483,
+  ratingCount: 3616,
+  ratingSyncLabel: '2026 年 9 月',
   loopDistance: '約3.0km',
   stay: '60〜150分',
   admission: '入園無料',
   opening: '公園は24時間利用可',
+  mapsShareUrl: 'https://maps.app.goo.gl/kKwAfJUftveaF9b38',
+  mapsEmbedSrc: 'https://www.google.com/maps?q=36.370985,140.4541765&z=15&output=embed',
+  govTourismUrl: 'https://kankou.ibaraki.jp/',
+  nearbyLandmark1: '偕楽園',
+  nearbyLandmark2: '水戸芸術館',
 } as const;
 
 export const itineraryItems = [
@@ -28,7 +35,7 @@ export const faqItems = [
   },
   {
     question: '千波湖は一周どのくらいですか？',
-    answer: '湖畔の周回コースは約3kmです。散歩なら休憩を含めて45〜70分ほどを目安にすると、景色をゆっくり楽しめます。',
+    answer: '湖畔の周回コースは約3kmです。徒歩なら約35〜40分、ジョギングで約15〜20分、自転車で約10分程度が目安です。景色をゆっくり楽しむなら休憩を含めて45〜70分ほど。',
   },
   {
     question: '水戸駅から歩いて行けますか？',
@@ -36,7 +43,7 @@ export const faqItems = [
   },
   {
     question: '駐車場はありますか？',
-    answer: '千波湖西側など周辺に駐車場があります。場所ごとに利用時間や料金が異なり、イベント時は混雑するため、現地案内を確認してください。',
+    answer: 'はい、千波湖の周りに複数の駐車場があり、無料の場所と有料の場所が混在しています。場所ごとに利用時間や料金が異なり、桜や梅の季節・イベント時は混雑するため、現地案内を確認してください。',
   },
   {
     question: '犬と一緒に散歩できますか？',

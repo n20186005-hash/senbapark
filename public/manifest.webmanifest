@@ -1,0 +1,26 @@
+{
+  "name": "千波公園（Senba Park）ガイド｜散歩・アクセス・周辺案内",
+  "short_name": "Senba Park",
+  "description": "水戸駅から歩ける千波公園・千波湖を、散歩コース、アクセス、駐車場、周辺案内まで案内する観光ガイド。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#17312a",
+  "theme_color": "#17312a",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

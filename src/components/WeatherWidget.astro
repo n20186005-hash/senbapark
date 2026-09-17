@@ -1,0 +1,332 @@
+---
+// 天気はサーバー側エンドポイント（/api/weather）で取得・キャッシュし、
+// クライアントで取得して表示する。訪問者は「傘が必要か」「服装は？」だけ知れれば十分。
+// 数値をそのまま出すのではなく、天気データから「今日すべきこと」を自動で提案する。
+---
+
+<section id="weather" class="section-shell bg-[#eef3f1]">
+  <div class="container-page">
+    <div class="mb-10 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+      <div>
+        <span class="section-kicker">天気・服装</span>
+        <h2 class="section-title">千波公園の天気</h2>
+      </div>
+      <p class="section-lead">出かける前に、今の空模様と数日の傾向、「今日は何を持っていくべきか」をさっと確認。雨の予報なら雨具を、冷え込む朝なら上着を。これだけで十分、安心です。</p>
+    </div>
+
+    <div id="weather-root" class="grid gap-5 lg:grid-cols-12" aria-live="polite">
+      <div class="surface flex items-center justify-center p-10 text-sm text-[#62736d] lg:col-span-12">天気を読み込み中…</div>
+    </div>
+
+    <p class="mt-5 text-xs text-[#8a988f]">気象データ：Open-Meteo</p>
+  </div>
+</section>
+
+<script>
+  const root = document.getElementById('weather-root');
+
+  const WMO: Record<number, { label: string; icon: string }> = {
+    0: { label: '晴れ', icon: '☀️' },
+    1: { label: '大体晴れ', icon: '🌤️' },
+    2: { label: '一部曇り', icon: '⛅' },
+    3: { label: '曇り', icon: '☁️' },
+    45: { label: '霧', icon: '🌫️' },
+    48: { label: '霧（着氷）', icon: '🌫️' },
+    51: { label: '弱い霧雨', icon: '🌦️' },
+    53: { label: '霧雨', icon: '🌦️' },
+    55: { label: '強い霧雨', icon: '🌦️' },
+    61: { label: '弱い雨', icon: '🌧️' },
+    63: { label: '雨', icon: '🌧️' },
+    65: { label: '強い雨', icon: '🌧️' },
+    66: { label: '着氷性の雨', icon: '🌧️' },
+    67: { label: '着氷性の強雨', icon: '🌧️' },
+    71: { label: '弱い雪', icon: '🌨️' },
+    73: { label: '雪', icon: '🌨️' },
+    75: { label: '強い雪', icon: '🌨️' },
+    80: { label: 'にわか雨', icon: '🌦️' },
+    81: { label: 'にわか雨', icon: '🌦️' },
+    82: { label: '激しいにわか雨', icon: '⛈️' },
+    85: { label: 'にわか雪', icon: '🌨️' },
+    86: { label: '激しいにわか雪', icon: '🌨️' },
+    95: { label: '雷雨', icon: '⛈️' },
+    96: { label: '雷雨（ひょう）', icon: '⛈️' },
+    99: { label: '激しい雷雨（ひょう）', icon: '⛈️' },
+  };
+  const wmo = (code: number) => WMO[code] ?? { label: 'その他', icon: '🌡️' };
+
+  function esc(s: string): string {
+    return s.replace(/[&<>"]/g, (c) => {
+      if (c === '&') return '&amp;';
+      if (c === '<') return '&lt;';
+      if (c === '>') return '&gt;';
+      return '&quot;';
+    });
+  }
+
+  function fmtDay(iso: string): string {
+    const d = new Date(iso + 'T00:00:00+09:00');
+    const wd = ['日', '月', '火', '水', '木', '金', '土'][d.getDay()];
+    return `${d.getMonth() + 1}/${d.getDate()}(${wd})`;
+  }
+
+  // km/h → 蒲福風力階級
+  function beaufort(kmh: number): number {
+    if (kmh < 1) return 0;
+    if (kmh < 6) return 1;
+    if (kmh < 12) return 2;
+    if (kmh < 20) return 3;
+    if (kmh < 29) return 4;
+    if (kmh < 39) return 5;
+    if (kmh < 50) return 6;
+    if (kmh < 62) return 7;
+    if (kmh < 75) return 8;
+    if (kmh < 89) return 9;
+    if (kmh < 103) return 10;
+    return 11;
+  }
+
+  function windWord(b: number): string {
+    if (b <= 2) return '弱い';
+    if (b <= 4) return 'ゆるやか';
+    if (b <= 6) return 'やや強い';
+    if (b <= 8) return '強い';
+    return '非常に強い';
+  }
+
+  const has = (arr: number[], v: number) => arr.includes(v);
+  const uniq = (a: string[]) => Array.from(new Set(a));
+
+  // 天気データから「今日すべきこと」を自動提案（千波公園＝都市公園＋湖畔の地形に合わせる）
+  function buildAdvice(t: any, c: any) {
+    const clothing: string[] = [];
+    const play: string[] = [];
+    const items: string[] = [];
+    const risks: string[] = [];
+
+    const tc = t.code;
+    const pop = t.pop;
+    const tmax = t.tmax;
+    const tmin = t.tmin;
+    const uv = t.uv;
+    const windB = beaufort(t.windMax);
+    const diff = tmax - tmin;
+
+    const thunder = [95, 96, 99];
+    const rainHeavy = [65, 66, 67, 82];
+    const rainLight = [51, 53, 55, 61, 63, 80, 81];
+    const fog = [45, 48];
+    const clear = [0, 1];
+    const cloud = [2, 3];
+
+    const rainAdvised = has(thunder, tc) || has(rainHeavy, tc) || has(rainLight, tc) || pop >= 60;
+
+    // 降水・雷
+    if (has(thunder, tc)) {
+      risks.push('雷のおそれがあります。湖畔でじっとしていることや木の下の避難は避け、早めに建物へ。');
+      play.push('水上の催しは中止になりやすいです。');
+      items.push('雨具（長傘よりレインウェアがよい）');
+    } else if (has(rainHeavy, tc)) {
+      risks.push('雨が強まる見込みです。低い土地や湖岸のへつりには近づかないようご注意を。');
+      play.push('屋外の遊びは控えめに。遊覧船・貸しボートは運航を見合わせる可能性があります。');
+      items.push('レインウェア（風が強いときは長傘より雨具を）');
+    } else if (pop >= 60) {
+      clothing.push('降水の可能性が高いので、雨具があると安心です。');
+      play.push('屋内施設（美術館や歴史館など）を組み合わせ、湖畔の長時間散歩や貸しボートは様子を見て決めましょう。');
+      items.push('折りたたみ傘 / レインウェア');
+    } else if (has(rainLight, tc)) {
+      clothing.push('小雨の予報です。路面が滑りやすいので歩行にご注意を。');
+      play.push('屋外の体験はいくぶん楽しみにくいかもしれません。');
+      items.push('折りたたみ傘');
+    }
+
+    // 高温・紫外線
+    if (tmax >= 32) {
+      clothing.push('気温が高くなります。正午前後の外出は控えめに。');
+      play.push('屋外の滞在は短めにし、こまめに休憩を。');
+      items.push('日除け、十分な飲み物、熱中症対策');
+    }
+    if (uv >= 5) {
+      clothing.push('紫外線が強いので日焼け対策を。');
+      items.push('日焼け止め、サングラス、帽子');
+    }
+
+    // 低温
+    if (diff > 8) {
+      clothing.push('朝晩の寒暖差が大きいので、脱ぎ着しやすい上着があると便利です。');
+    }
+    if (tmax <= 10) {
+      clothing.push('気温が低めです。防寒をしっかりと。');
+      items.push('厚手のコート、マフラー');
+    }
+
+    // 風力
+    if (windB >= 7) {
+      risks.push('強風の見込みです。湖岸の岩場や看板の近くは避けてください。');
+      play.push('屋外の水上プログラムは中止になりやすいです。');
+    } else if (windB >= 5) {
+      clothing.push('風がやや強いので、帽子は飛びやすく、ゆったりした服装は避けた方がよいです。');
+      play.push('湖上の遊覧船・貸しボートは欠航の可能性があります。');
+    }
+
+    // 晴・曇（雨のアドバイスが出ていないときだけ）
+    if (!rainAdvised && has(clear, tc)) {
+      clothing.push('天気はよいので、屋外の散歩にぴったりです。');
+      play.push('朝焼け・夕焼けの景色もおすすめです。');
+    } else if (!rainAdvised && has(cloud, tc)) {
+      clothing.push('光がやわらかく、写真撮影にも向いています。');
+      play.push('日ざしを気にせず、長時間の屋外散歩がしやすいです。');
+    }
+
+    // 霧
+    if (has(fog, tc)) {
+      risks.push('霧の予報です。視界が悪く、湖面の眺めは見えにくいかもしれません。');
+    }
+
+    return {
+      clothing: uniq(clothing),
+      play: uniq(play),
+      items: uniq(items),
+      risks: uniq(risks),
+    };
+  }
+
+  function render(data: any) {
+    if (!root || !data?.current || !data?.daily) return;
+    const c = data.current;
+    const cur = wmo(c.weather_code);
+    const daily = data.daily;
+
+    const t = {
+      code: daily.weather_code[0],
+      tmax: daily.temperature_2m_max[0],
+      tmin: daily.temperature_2m_min[0],
+      pop: daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0,
+      uv: daily.uv_index_max ? daily.uv_index_max[0] : 0,
+      windMax: daily.wind_speed_10m_max ? daily.wind_speed_10m_max[0] : c.wind_speed_10m,
+    };
+
+    const windB = beaufort(t.windMax);
+    const windLabel = `${windWord(windB)}（最大約${Math.round(t.windMax)}km/h）`;
+
+    const days = daily.time.map((iso: string, i: number) => ({
+      label: fmtDay(iso),
+      icon: wmo(daily.weather_code[i]).icon,
+      max: Math.round(daily.temperature_2m_max[i]),
+      min: Math.round(daily.temperature_2m_min[i]),
+      pop: daily.precipitation_probability_max ? daily.precipitation_probability_max[i] : null,
+    }));
+
+    const currentCard = `
+      <article class="surface p-7 sm:p-9 lg:col-span-5">
+        <p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">現在の天気</p>
+        <div class="mt-3 flex items-center gap-4">
+          <span class="text-6xl leading-none" aria-hidden="true">${cur.icon}</span>
+          <div>
+            <div class="flex items-end gap-2">
+              <span class="font-serif text-6xl leading-none text-[#17312a]">${Math.round(c.temperature_2m)}</span>
+              <span class="pb-2 text-lg text-[#62736d]">℃</span>
+            </div>
+            <p class="mt-1 text-sm text-[#62736d]">${esc(cur.label)} · 体感 ${Math.round(c.apparent_temperature)}℃</p>
+          </div>
+        </div>
+        <dl class="mt-6 grid grid-cols-3 gap-3 text-center text-xs">
+          <div class="rounded-2xl bg-white/60 p-3"><dt class="text-[#8a988f]">降水確率</dt><dd class="mt-1 font-bold text-[#17312a]">${Math.round(t.pop)}%</dd></div>
+          <div class="rounded-2xl bg-white/60 p-3"><dt class="text-[#8a988f]">風</dt><dd class="mt-1 font-bold text-[#17312a]">${esc(windLabel)}</dd></div>
+          <div class="rounded-2xl bg-white/60 p-3"><dt class="text-[#8a988f]">紫外線</dt><dd class="mt-1 font-bold text-[#17312a]">${Math.round(t.uv)}</dd></div>
+        </dl>
+      </article>`;
+
+    const forecastCard = `
+      <article class="surface p-7 sm:p-9 lg:col-span-7">
+        <p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">今後の予報</p>
+        <ul class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-7">
+          ${days
+            .map(
+              (d: any, i: number) => `
+            <li class="rounded-2xl bg-white/60 p-3 text-center ${i === 0 ? 'ring-1 ring-[#17312a]/15' : ''}">
+              <p class="text-xs font-bold text-[#62736d]">${esc(d.label)}</p>
+              <p class="my-2 text-2xl" aria-hidden="true">${d.icon}</p>
+              <p class="text-sm font-bold text-[#17312a]">${d.max}°</p>
+              <p class="text-xs text-[#8a988f]">${d.min}°</p>
+              ${d.pop != null ? `<p class="mt-1 text-[.65rem] text-[#6c8177]">雨${d.pop}%</p>` : ''}
+            </li>`
+            )
+            .join('')}
+        </ul>
+        <p class="mt-5 text-xs text-[#8a988f]">予報は目安です。当日の最新情報をご確認ください。</p>
+      </article>`;
+
+    const a = buildAdvice(t, c);
+    let adviceHtml = '';
+
+    if (a.risks.length) {
+      adviceHtml += `<div class="lg:col-span-12 rounded-2xl border border-[#b4452f]/30 bg-[#b4452f]/10 p-5">
+        <p class="text-xs font-extrabold tracking-[.15em] text-[#b4452f]">⚠ 注意・リスク情報</p>
+        <ul class="mt-2 space-y-1 text-sm text-[#7a2f1f]">${a.risks.map((r) => `<li>· ${esc(r)}</li>`).join('')}</ul>
+      </div>`;
+    }
+
+    if (a.clothing.length || a.play.length || a.items.length) {
+      const def = a.clothing.length ? 'clothing' : a.play.length ? 'play' : 'items';
+      const tabBtn = (key: string, label: string) =>
+        a[key as keyof typeof a].length
+          ? `<button type="button" class="tab-btn rounded-full border px-4 py-2 text-xs font-bold ${
+              def === key ? 'bg-[#17312a] text-white' : 'border-[#17312a]/15 text-[#17312a]'
+            }" data-tab="${key}">${label}</button>`
+          : '';
+      const panel = (key: string, arr: string[]) =>
+        arr.length
+          ? `<ul class="mt-4 space-y-2 text-sm text-[#60716a] ${def === key ? '' : 'hidden'}" data-panel="${key}">${arr
+              .map((x) => `<li class="flex gap-2"><span class="text-[#6c8177]">✓</span><span>${esc(x)}</span></li>`)
+              .join('')}</ul>`
+          : '';
+
+      adviceHtml += `<div class="lg:col-span-12 surface p-7 sm:p-9">
+        <p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">今日のアドバイス</p>
+        <div class="mt-4 flex flex-wrap gap-2" role="tablist">
+          ${tabBtn('clothing', '服装・行動')}${tabBtn('play', '遊び方')}${tabBtn('items', '持ち物')}
+        </div>
+        ${panel('clothing', a.clothing)}${panel('play', a.play)}${panel('items', a.items)}
+      </div>`;
+    } else {
+      adviceHtml += `<div class="lg:col-span-12 surface p-7 sm:p-9 text-sm text-[#60716a]">今日はとくに気をつけることはなさそうです。良い一日を。</div>`;
+    }
+
+    root.innerHTML = currentCard + forecastCard + adviceHtml;
+
+    const tablist = root.querySelector('[role="tablist"]');
+    if (tablist) {
+      tablist.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('button[data-tab]');
+        if (!btn) return;
+        const tab = btn.getAttribute('data-tab');
+        tablist.querySelectorAll('button[data-tab]').forEach((b) => {
+          const on = b === btn;
+          b.classList.toggle('bg-[#17312a]', on);
+          b.classList.toggle('text-white', on);
+          b.classList.toggle('border-[#17312a]/15', !on);
+          b.classList.toggle('text-[#17312a]', !on);
+        });
+        root!.querySelectorAll('[data-panel]').forEach((p) => {
+          (p as HTMLElement).hidden = p.getAttribute('data-panel') !== tab;
+        });
+      });
+    }
+  }
+
+  async function load() {
+    if (!root) return;
+    try {
+      const res = await fetch('/api/weather');
+      if (!res.ok) throw new Error('bad');
+      const data = await res.json();
+      render(data);
+    } catch {
+      if (root) {
+        root.innerHTML = `<div class="surface flex items-center justify-center p-10 text-sm text-[#62736d] lg:col-span-12">現在、天気を取得できません。しばらくしてから再度お試しください。</div>`;
+      }
+    }
+  }
+
+  load();
+</script>

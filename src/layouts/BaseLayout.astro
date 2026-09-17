@@ -29,6 +29,10 @@ const ogImage = new URL(imagePath, Astro.site);
     <meta name="theme-color" content="#17312a" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Senba Park" />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ja_JP" />
@@ -58,5 +62,13 @@ const ogImage = new URL(imagePath, Astro.site);
   <body>
     <a class="skip-link" href="#main-content">本文へ移動</a>
     <slot />
+
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
