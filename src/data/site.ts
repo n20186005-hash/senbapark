@@ -6,8 +6,8 @@ export const facts = {
   latitude: 36.370985,
   longitude: 140.4541765,
   ratingValue: 4.1,
-  ratingCount: 3616,
-  ratingSyncLabel: '2026 年 9 月',
+  ratingCount: 3623,
+  ratingSyncLabel: '2026 年 10 月',
   loopDistance: '約3.0km',
   stay: '60〜150分',
   admission: '入園無料',
@@ -17,6 +17,31 @@ export const facts = {
   govTourismUrl: 'https://kankou.ibaraki.jp/',
   nearbyLandmark1: '偕楽園',
   nearbyLandmark2: '水戸芸術館',
+} as const;
+
+export const verifiedDate = '2026年10月14日';
+
+export const parking = {
+  west: {
+    name: '千波湖西駐車場',
+    address: '水戸市千波町2751',
+    weekday: '原則として無料',
+    holiday: '普通車 500円／回',
+    freeExit: '入庫後30分以内の退出は無料',
+    hours: '24時間入出庫可',
+    standard: 155,
+    large: 22,
+    chargedNote: '1月1日〜3日、および水戸の梅まつり期間中などの指定日も有料となります。',
+    autoPaySince: '2026年8月7日',
+  },
+  areas: [
+    { name: '千波湖西駐車場', note: '湖の西側、湖畔まで近い。平日は原則無料、土日祝・指定日は有料。' },
+    { name: '湖南駐車場', note: '湖の南側、偕楽園方面への動線に便利。' },
+    { name: '偕楽園下駐車場', note: '偕楽園利用時に便利。花の季節は満車しやすい。' },
+  ],
+  sourceName: '水戸観光コンベンション協会',
+  sourceUrl: 'https://mitokoumon.com/access/parking/',
+  cityUrl: 'https://www.city.mito.lg.jp/page/4710.html',
 } as const;
 
 export const itineraryItems = [
@@ -43,7 +68,7 @@ export const faqItems = [
   },
   {
     question: '駐車場はありますか？',
-    answer: 'はい、千波湖の周りに複数の駐車場があり、無料の場所と有料の場所が混在しています。場所ごとに利用時間や料金が異なり、桜や梅の季節・イベント時は混雑するため、現地案内を確認してください。',
+    answer: 'はい、千波湖の周りに複数の駐車場があり、無料の場所と有料の場所が混在しています。例えば千波湖西駐車場は平日は原則無料、土曜・日曜・祝日などの指定日は普通車500円／回（入庫後30分以内の退出は無料）です。場所ごとに利用時間や料金が異なり、詳しくは「駐車場ガイド」のページをご確認ください。',
   },
   {
     question: '犬と一緒に散歩できますか？',

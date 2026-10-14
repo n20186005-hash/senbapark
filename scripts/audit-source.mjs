@@ -1,7 +1,8 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { extname, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = resolve(new URL('..', import.meta.url).pathname);
+const root = fileURLToPath(new URL('..', import.meta.url));
 const packagePath = join(root, 'package.json');
 const astroConfigPath = join(root, 'astro.config.mjs');
 const packageJson = JSON.parse(await readFile(packagePath, 'utf8'));

@@ -1,0 +1,102 @@
+---
+import SubpageLayout from '../../layouts/SubpageLayout.astro';
+import FaqList from '../../components/FaqList.astro';
+
+export const prerender = true;
+
+const title = '千波公園・千波湖の見どころ｜観光・散歩・体験';
+const description = '千波公園・千波湖の見どころをまとめました。湖畔一周の散歩、白鳥の観察、スワンボート、好文カフェ、桜並木、湖上噴水、そして隣接する偕楽園まで。おすすめの過ごし方を紹介します。';
+const breadcrumbs = [{ name: '見どころ', href: '/things-to-do/' }];
+
+const highlights = [
+  { name: '湖畔ウォーク', note: '一周約3kmの舗装コース。景色を眺めながらゆっくり歩くなら45〜70分ほど。', tag: '散歩' },
+  { name: '白鳥・黒鳥', note: '湖面に浮かぶ鳥の観察スポット。静かな朝が観察しやすいです。', tag: '自然' },
+  { name: 'スワンボート', note: '季節運航の湖上ボート。家族や友人と湖からの景色を楽しめます。', tag: '体験' },
+  { name: '好文カフェ', note: '湖を眺めながらひと休み。飲み物や軽食で湖畔の時間を長く楽しめます。', tag: '休憩' },
+  { name: '桜並木', note: '花の時期は湖畔が桜で彩られます。早い時間の散策がおすすめです。', tag: '季節' },
+  { name: '湖上噴水', note: '夕景と合わせて眺めたい景観。日没前後の色の変化が楽しめます。', tag: '景観' },
+];
+
+const faqItems = [
+  {
+    question: '千波公園で何ができますか？',
+    answer: '湖畔の散歩、白鳥などの鳥の観察、季節運航のスワンボート、カフェでの休憩、桜並木や湖上噴水の景観などが楽しめます。目的に合わせて自由に過ごせる公園です。',
+  },
+  {
+    question: '一日どのくらい滞在すればいいですか？',
+    answer: '短時間の湖畔散歩なら約60分、一周してカフェ休憩を挟むなら90〜150分が目安です。',
+  },
+  {
+    question: '偕楽園も一緒に回れますか？',
+    answer: '千波湖から偕楽園へは散歩で足を延ばせる距離です。梅や歴史、庭園を組み合わせる定番のルートです。',
+  },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+---
+<SubpageLayout title={title} description={description} breadcrumbs={breadcrumbs} structuredData={[faqSchema]}>
+  <section class="relative overflow-hidden bg-[#17312a] text-white">
+    <div class="container-page py-16 sm:py-20">
+      <div class="max-w-3xl reveal">
+        <span class="section-kicker !text-[#bcd3c8]">見どころ</span>
+        <h1 class="mt-4 font-serif text-[clamp(2.2rem,6vw,4rem)] leading-[1.05] tracking-[-.03em]">千波公園で<br />過ごす</h1>
+        <p class="mt-5 text-base leading-8 text-white/76 sm:text-lg">「千波湖 見どころ」「千波公園 観光」で調べる方へ。湖畔の散歩から体験、隣接する偕楽園まで、おすすめの過ごし方をまとめました。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="container-page">
+      <div class="mb-10"><span class="section-kicker">観光・散歩</span><h2 class="section-title">千波湖の、<br />見どころ。</h2></div>
+      <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {highlights.map((item) => (
+          <article class="surface p-7">
+            <span class="tag">{item.tag}</span>
+            <h3 class="mt-5 font-serif text-2xl text-[#17312a]">{item.name}</h3>
+            <p class="mt-3 text-sm text-[#60716a]">{item.note}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell bg-[#e9f0ea]">
+    <div class="container-page">
+      <div class="mb-10 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+        <div><span class="section-kicker">周辺スポット</span><h2 class="section-title">一本の散歩に、<br />足してみる。</h2></div>
+        <p class="section-lead">千波湖だけで終わらせず、目的に合わせて一か所を足すのがおすすめです。</p>
+      </div>
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {[
+          ['偕楽園', '庭園・梅・水戸の歴史', '自然と歴史を一緒に楽しむ王道。'],
+          ['好文亭', '建築・眺望', '偕楽園内の建築。開館状況を確認して組み合わせる。'],
+          ['常磐神社', '神社・文化', '偕楽園に隣接。参拝と散策を短時間で。'],
+          ['茨城県近代美術館', '美術・室内', '天候が不安定な日にも合わせやすい。'],
+          ['茨城県立歴史館', '歴史・庭園', '水戸と茨城の歴史を深く知りたい日に。'],
+          ['水戸芸術館', '現代美術・音楽', 'まちなかへ移動して文化に触れる。'],
+        ].map(([name, tag, text]) => (
+          <article class="group rounded-3xl border border-[#17312a]/12 bg-white/58 p-6">
+            <span class="tag">{tag}</span>
+            <h3 class="mt-5 font-serif text-2xl text-[#17312a]">{name}</h3>
+            <p class="mt-3 text-sm text-[#62736d]">{text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="container-page grid gap-10 lg:grid-cols-[.7fr_1.3fr]">
+      <div><span class="section-kicker">よくある質問</span><h2 class="section-title">見どころの<br />よくある質問</h2></div>
+      <FaqList items={faqItems} />
+    </div>
+  </section>
+</SubpageLayout>

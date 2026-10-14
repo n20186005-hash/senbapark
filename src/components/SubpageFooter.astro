@@ -1,0 +1,37 @@
+---
+const official = [
+  { name: '水戸市公式（千波公園の紹介）', url: 'https://www.city.mito.lg.jp/page/4710.html' },
+  { name: '水戸観光コンベンション協会（駐車場情報）', url: 'https://mitokoumon.com/access/parking/' },
+];
+const nav = [
+  { href: '/', label: 'ホーム' },
+  { href: '/parking/', label: '駐車場' },
+  { href: '/walking-course/', label: '一周コース' },
+  { href: '/access/', label: 'アクセス' },
+  { href: '/sakura/', label: '桜' },
+  { href: '/things-to-do/', label: '見どころ' },
+];
+---
+<footer class="bg-[#102720] py-10 text-white">
+  <div class="container-page grid gap-7 border-b border-white/10 pb-8 md:grid-cols-[1fr_auto] md:items-end">
+    <div>
+      <p class="font-serif text-2xl">千波公園・千波湖ガイド</p>
+      <p class="mt-3 max-w-xl text-xs leading-relaxed text-white/55">当サイトは千波公園・千波湖を紹介する独立した観光情報ガイドです。水戸市および施設管理者の公式サイトではありません。</p>
+    </div>
+    <nav class="flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold text-white/60" aria-label="フッターナビゲーション">
+      {nav.map((item) => (
+        <a class="hover:text-white" href={item.href}>{item.label}</a>
+      ))}
+    </nav>
+  </div>
+  <div class="container-page pt-6 text-xs text-white/42">
+    <p class="mb-3">掲載情報は変わる場合があります。現地案内・公式サイトを優先してください。</p>
+    <p class="mb-2 font-bold text-white/55">関連する公式・団体サイト</p>
+    <ul class="space-y-1">
+      {official.map((o) => (
+        <li><a href={o.url} target="_blank" rel="noopener noreferrer" class="underline underline-offset-2 hover:text-white/70">{o.name} ↗</a></li>
+      ))}
+    </ul>
+    <p class="mt-4 text-white/30">© 千波公園・千波湖ガイド</p>
+  </div>
+</footer>

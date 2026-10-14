@@ -1,0 +1,159 @@
+---
+import SubpageLayout from '../../layouts/SubpageLayout.astro';
+import FaqList from '../../components/FaqList.astro';
+import { parking, verifiedDate } from '../../data/site';
+
+export const prerender = true;
+
+const title = '千波公園・千波湖の駐車場ガイド｜無料日・料金・場所を解説';
+const description = '千波公園・千波湖の駐車場を解説。千波湖西駐車場の料金（平日原則無料・土日祝500円）、無料条件、収容台数（普通車155台・大型22台）、24時間利用、有料日と自動料金収受の開始時期をまとめました。';
+const breadcrumbs = [{ name: '駐車場', href: '/parking/' }];
+
+const faqItems = [
+  {
+    question: '千波公園の駐車場は無料ですか？',
+    answer: '千波湖の周りには複数の駐車場があり、無料の場所と有料の場所が混在しています。例えば千波湖西駐車場は平日は原則無料、土曜・日曜・祝日などの指定日は普通車500円／回です（入庫後30分以内の退出は無料）。',
+  },
+  {
+    question: '千波湖西駐車場の営業時間は？',
+    answer: '24時間入出庫できます。夜間や早朝の散歩でも利用しやすい一方、周辺道路の交通規制や混雑にはご注意ください。',
+  },
+  {
+    question: '駐車場の台数はどのくらいですか？',
+    answer: '千波湖西駐車場には普通車155台、大型車22台の駐車スペースがあります。花の季節やイベント時は満車になりやすいため、時間に余裕を持ってお出かけください。',
+  },
+  {
+    question: 'いつ有料になりますか？',
+    answer: '土曜・日曜・祝日のほか、1月1日〜3日、および水戸の梅まつり期間中などの指定日も有料となります。詳細は現地の案内や公式情報をご確認ください。',
+  },
+  {
+    question: '支払いはどうなっていますか？',
+    answer: `千波湖西駐車場では2026年8月7日から自動料金収受システムが導入されています。現金・電子決済など対応方法の詳細は現地表示をご確認ください。`,
+  },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+---
+<SubpageLayout title={title} description={description} breadcrumbs={breadcrumbs} structuredData={[faqSchema]}>
+  <section class="relative overflow-hidden bg-[#17312a] text-white">
+    <div class="container-page py-16 sm:py-20">
+      <div class="max-w-3xl reveal">
+        <span class="section-kicker !text-[#bcd3c8]">駐車場ガイド</span>
+        <h1 class="mt-4 font-serif text-[clamp(2.2rem,6vw,4rem)] leading-[1.05] tracking-[-.03em]">千波公園・千波湖の<br />駐車場を解説</h1>
+        <p class="mt-5 text-base leading-8 text-white/76 sm:text-lg">「千波公園 駐車場」「千波湖 駐車場 無料」で調べる方へ。最も近い千波湖西駐車場の料金や無料条件、台数、利用時間をまとめました。出発前の目安としてご活用ください。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="container-page">
+      <div class="mb-10"><span class="section-kicker">千波湖西駐車場</span><h2 class="section-title">基本情報を、<br />ひと目で確認。</h2></div>
+      <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <article class="surface p-7"><p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">住所</p><p class="mt-3 font-serif text-xl text-[#17312a]">{parking.west.address}</p></article>
+        <article class="surface p-7"><p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">営業・利用時間</p><p class="mt-3 font-serif text-xl text-[#17312a]">{parking.west.hours}</p></article>
+        <article class="surface p-7"><p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">無料条件</p><p class="mt-3 font-serif text-xl text-[#17312a]">{parking.west.freeExit}</p></article>
+        <article class="surface p-7"><p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">平日</p><p class="mt-3 font-serif text-xl text-[#17312a]">{parking.west.weekday}</p></article>
+        <article class="surface p-7"><p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">土日祝・指定日</p><p class="mt-3 font-serif text-xl text-[#17312a]">{parking.west.holiday}</p></article>
+        <article class="surface p-7"><p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">収容台数</p><p class="mt-3 font-serif text-xl text-[#17312a]">普通車 {parking.west.standard}台・大型 {parking.west.large}台</p></article>
+      </div>
+      <p class="mt-6 text-xs text-[#7b8883]">情報は{parking.sourceName}が公開する内容をもとに{verifiedDate}に確認・整理しました。料金・利用時間は変更されることがあります。現地表示を優先してください。</p>
+    </div>
+  </section>
+
+  <section class="section-shell bg-[#e9f0ea]">
+    <div class="container-page">
+      <div class="mb-10 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+        <div><span class="section-kicker">料金・無料の目安</span><h2 class="section-title">いつ無料で、<br />いつ有料？</h2></div>
+        <p class="section-lead">千波湖西駐車場は平日は原則として無料ですが、土曜・日曜・祝日や一部の指定日は有料となります。短期間の滞在なら無料で利用できるケースも多いため、目安を押さえておくと安心です。</p>
+      </div>
+      <div class="grid gap-5 lg:grid-cols-2">
+        <article class="rounded-[1.6rem] bg-[#17312a] p-7 text-white sm:p-9">
+          <h3 class="font-serif text-2xl">無料で利用しやすい日</h3>
+          <ul class="mt-5 space-y-3 text-sm text-white/78">
+            <li>・平日（土日祝を除く）：原則として無料</li>
+            <li>・入庫後30分以内の退出：無料</li>
+            <li>・短時間の散歩やカフェ利用で嬉しい条件</li>
+          </ul>
+        </article>
+        <article class="surface p-7 sm:p-9">
+          <h3 class="font-serif text-2xl text-[#17312a]">有料となる日</h3>
+          <ul class="mt-5 space-y-3 text-sm text-[#60716a]">
+            <li>・土曜・日曜・祝日：普通車 500円／回</li>
+            <li>・1月1日〜3日などの指定日</li>
+            <li>・水戸の梅まつり期間中などの指定日</li>
+          </ul>
+          <p class="mt-5 text-xs text-[#7b8883]">{parking.west.chargedNote}</p>
+        </article>
+      </div>
+      <p class="mt-6 rounded-2xl border border-[#17312a]/12 bg-white/70 p-5 text-sm text-[#60716a]">自動料金収受システムは{parking.west.autoPaySince}から導入されています。決済方法の詳細は現地の案内をご確認ください。</p>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="container-page">
+      <div class="mb-10"><span class="section-kicker">周辺の駐車場</span><h2 class="section-title">選べる、<br />いくつかの場所。</h2></div>
+      <div class="grid gap-5 md:grid-cols-3">
+        {parking.areas.map((area) => (
+          <article class="surface p-7">
+            <h3 class="font-serif text-2xl text-[#17312a]">{area.name}</h3>
+            <p class="mt-3 text-sm text-[#60716a]">{area.note}</p>
+          </article>
+        ))}
+      </div>
+      <p class="mt-6 text-xs text-[#7b8883]">各駐車場の料金・利用時間・満空状況は異なります。混雑時は湖畔から少し離れた場所や公共交通も選択肢に入れると動きやすくなります。</p>
+    </div>
+  </section>
+
+  <section class="section-shell bg-[#e9f0ea]">
+    <div class="container-page">
+      <div class="mb-10 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+        <div><span class="section-kicker">混雑と注意点</span><h2 class="section-title">混雑を避ける<br />小さな工夫。</h2></div>
+        <p class="section-lead">桜や梅の季節、週末、イベント開催日は周辺道路と駐車場が混みやすくなります。到着を早める、公共交通を組み合わせるなどの工夫でゆとりが生まれます。</p>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <article class="rounded-3xl bg-white/72 p-6 shadow-sm"><h3 class="font-serif text-xl text-[#17312a]">早めの到着</h3><p class="mt-3 text-sm text-[#60716a]">花の季節や連休は開園・開店前の早い時間が比較的空きやすい傾向があります。</p></article>
+        <article class="rounded-3xl bg-white/72 p-6 shadow-sm"><h3 class="font-serif text-xl text-[#17312a]">公共交通の活用</h3><p class="mt-3 text-sm text-[#60716a]">JR水戸駅から徒歩でもアクセスできるため、混雑時は駅からの移動も選択肢になります。</p></article>
+        <article class="rounded-3xl bg-[#17312a] p-6 text-white shadow-sm"><h3 class="font-serif text-xl">現地表示の確認</h3><p class="mt-3 text-sm text-white/70">料金や営業時間は変更されることがあります。入口の案内を最優先にしてください。</p></article>
+        <article class="rounded-3xl bg-[#17312a] p-6 text-white shadow-sm"><h3 class="font-serif text-xl">大型車の台数に注意</h3><p class="mt-3 text-sm text-white/70">大型車は22台のみ。マイクロバス等でお越しの際は余裕を持った計画を。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="container-page grid gap-10 lg:grid-cols-[.7fr_1.3fr]">
+      <div><span class="section-kicker">よくある質問</span><h2 class="section-title">駐車場の<br />よくある質問</h2></div>
+      <FaqList items={faqItems} />
+    </div>
+  </section>
+
+  <section class="section-shell bg-[#e9f0ea]">
+    <div class="container-page">
+      <div class="mb-8"><span class="section-kicker">出典・資料來源</span><h2 class="section-title">資料來源</h2></div>
+      <ul class="space-y-4">
+        <li class="surface flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="font-bold">駐車場情報（{parking.sourceName}）</p>
+            <p class="mt-1 text-sm text-[#62736d]">千波湖西駐車場の料金・台数・利用時間などの公開情報。確認日：{verifiedDate}。</p>
+          </div>
+          <a href={parking.sourceUrl} target="_blank" rel="noopener noreferrer" class="btn-secondary shrink-0">公式の駐車場情報 ↗</a>
+        </li>
+        <li class="surface flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="font-bold">水戸市公式（千波公園の紹介）</p>
+            <p class="mt-1 text-sm text-[#62736d]">公園の概要や観光情報は公式サイトでご確認ください。</p>
+          </div>
+          <a href={parking.cityUrl} target="_blank" rel="noopener noreferrer" class="btn-secondary shrink-0">水戸市公式サイト ↗</a>
+        </li>
+      </ul>
+      <p class="mt-6 text-xs text-[#7b8883]">掲載内容は{parking.sourceName}の公開情報を参考にしていますが、料金・利用条件は変更される場合があります。最新情報は現地案内および公式サイトを優先してください。</p>
+    </div>
+  </section>
+</SubpageLayout>

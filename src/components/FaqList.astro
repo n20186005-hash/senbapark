@@ -1,0 +1,17 @@
+---
+interface Props {
+  items: { question: string; answer: string }[];
+}
+const { items } = Astro.props;
+---
+<div class="space-y-3">
+  {items.map((item, index) => (
+    <details class="group rounded-2xl border border-[#17312a]/12 bg-white/68 px-5 py-1 open:bg-white sm:px-7">
+      <summary class="flex cursor-pointer list-none items-center justify-between gap-5 py-5 font-bold">
+        <span><span class="mr-3 font-serif text-[#8da095]">{String(index + 1).padStart(2, '0')}</span>{item.question}</span>
+        <span class="grid size-7 shrink-0 place-items-center rounded-full border border-[#17312a]/15 transition group-open:rotate-45" aria-hidden="true">＋</span>
+      </summary>
+      <p class="border-t border-[#17312a]/10 pb-6 pt-5 text-sm text-[#60716a]">{item.answer}</p>
+    </details>
+  ))}
+</div>

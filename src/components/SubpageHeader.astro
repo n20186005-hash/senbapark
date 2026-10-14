@@ -1,0 +1,24 @@
+---
+const nav = [
+  { href: '/parking/', label: '駐車場' },
+  { href: '/walking-course/', label: '一周コース' },
+  { href: '/access/', label: 'アクセス' },
+  { href: '/sakura/', label: '桜' },
+  { href: '/things-to-do/', label: '見どころ' },
+];
+---
+<header class="border-b border-[#17312a]/10 bg-[#17312a] text-white">
+  <div class="container-page flex items-center justify-between gap-4 py-3">
+    <a href="/" class="flex shrink-0 items-center gap-2.5" aria-label="千波公園ガイド トップへ">
+      <span class="grid size-8 place-items-center rounded-full border border-white/25 bg-white/10" aria-hidden="true">
+        <svg viewBox="0 0 24 24" class="size-4 fill-none stroke-current" stroke-width="1.5"><path d="M3 14c2.2-2 4.4-2 6.6 0s4.4 2 6.6 0 3.2-2 4.8-1.2"/><path d="M6 9c2.5-3.7 9.2-3.7 12 0"/><path d="M12 4v3"/></svg>
+      </span>
+      <span class="font-serif text-[1rem] tracking-[.08em]">千波公園ガイド</span>
+    </a>
+    <nav aria-label="サブページナビゲーション" class="flex items-center gap-3 overflow-x-auto text-xs font-bold tracking-[.04em] text-white/80">
+      {nav.map((item) => (
+        <a class="whitespace-nowrap hover:text-white" href={item.href}>{item.label}</a>
+      ))}
+    </nav>
+  </div>
+</header>

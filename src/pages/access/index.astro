@@ -1,0 +1,103 @@
+---
+import SubpageLayout from '../../layouts/SubpageLayout.astro';
+import FaqList from '../../components/FaqList.astro';
+
+export const prerender = true;
+
+const title = '千波公園へのアクセス｜水戸駅からの行き方・駐車場';
+const description = '千波公園・千波湖へのアクセスを解説。JR水戸駅南口から湖畔まで徒歩約15分、北口から路線バス、常磐道水戸ICから車で約30分。駐車場の詳細は「駐車場ガイド」もご覧ください。';
+const breadcrumbs = [{ name: 'アクセス', href: '/access/' }];
+
+const faqItems = [
+  {
+    question: '水戸駅から千波公園まで歩いて何分ですか？',
+    answer: 'JR水戸駅南口から千波湖方面へ徒歩で約15分が目安です。天候が良ければもっとも分かりやすいルートです。',
+  },
+  {
+    question: '車で行く場合の目安は？',
+    answer: '常磐自動車道 水戸ICから一般道で約30分、北関東自動車道 水戸南ICから約20分が目安です。周辺駐車場の混雑にはご注意ください。',
+  },
+  {
+    question: 'バスは利用できますか？',
+    answer: 'JR水戸駅北口ののりばから千波湖・偕楽園方面への路線バスが利用できます。降車停留所と運行時刻は当日の案内をご確認ください。',
+  },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+---
+<SubpageLayout title={title} description={description} breadcrumbs={breadcrumbs} structuredData={[faqSchema]}>
+  <section class="relative overflow-hidden bg-[#17312a] text-white">
+    <div class="container-page py-16 sm:py-20">
+      <div class="max-w-3xl reveal">
+        <span class="section-kicker !text-[#bcd3c8]">アクセス</span>
+        <h1 class="mt-4 font-serif text-[clamp(2.2rem,6vw,4rem)] leading-[1.05] tracking-[-.03em]">千波公園への<br />行き方</h1>
+        <p class="mt-5 text-base leading-8 text-white/76 sm:text-lg">「水戸駅から千波湖」「千波湖 アクセス」で調べる方へ。電車・バス・車それぞれの目安をまとめました。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="container-page">
+      <div class="mb-10 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+        <div><span class="section-kicker">交通手段</span><h2 class="section-title">駅から歩く。<br />車なら余白を持つ。</h2></div>
+        <p class="section-lead">水戸駅から徒歩で向かえるのが千波公園の強みです。週末や花の季節、催しの日は周辺道路と駐車場が混みやすいため、公共交通も選択肢に。</p>
+      </div>
+
+      <div class="space-y-5">
+        <article class="surface p-7 sm:p-9">
+          <div class="flex items-start justify-between gap-5"><div><span class="tag">電車・徒歩</span><h3 class="mt-4 font-serif text-3xl">JR水戸駅から</h3></div><span class="font-serif text-5xl text-[#9caf9f]">01</span></div>
+          <ol class="mt-6 space-y-4 text-sm">
+            <li class="border-l-2 border-[#17312a]/15 pl-5"><strong class="block">南口から徒歩</strong><span class="text-[#60716a]">駅を出て千波湖方面へ。目安は約15分。天候がよければ最も分かりやすい移動です。</span></li>
+            <li class="border-l-2 border-[#17312a]/15 pl-5"><strong class="block">北口から路線バス</strong><span class="text-[#60716a]">北口ののりばから千波湖・偕楽園方面へ。降車停留所と運行時刻は当日の案内を確認してください。</span></li>
+          </ol>
+        </article>
+
+        <article class="surface p-7 sm:p-9">
+          <div class="flex items-start justify-between gap-5"><div><span class="tag">車</span><h3 class="mt-4 font-serif text-3xl">高速道路から</h3></div><span class="font-serif text-5xl text-[#9caf9f]">02</span></div>
+          <dl class="mt-6 space-y-4 text-sm">
+            <div class="border-b border-[#17312a]/10 pb-4"><dt class="font-bold">常磐自動車道 水戸IC</dt><dd class="mt-1 text-[#60716a]">一般道でおよそ30分が目安。</dd></div>
+            <div><dt class="font-bold">北関東自動車道 水戸南IC</dt><dd class="mt-1 text-[#60716a]">一般道でおよそ20分が目安。</dd></div>
+          </dl>
+        </article>
+
+        <article class="surface p-7 sm:p-9">
+          <div class="flex items-start justify-between gap-5"><div><span class="tag">空港</span><h3 class="mt-4 font-serif text-3xl">茨城空港から</h3></div><span class="font-serif text-5xl text-[#9caf9f]">03</span></div>
+          <p class="mt-6 text-sm text-[#60716a]">茨城空港から水戸駅方面への連絡バスで約50分、その後徒歩で湖畔へ。運航・ダイヤは当日の案内をご確認ください。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell bg-[#e9f0ea]">
+    <div class="container-page">
+      <div class="mb-8"><span class="section-kicker">駐車場をお探しの方へ</span><h2 class="section-title">車でお越しの方へ</h2></div>
+      <div class="grid gap-5 md:grid-cols-2">
+        <article class="rounded-3xl bg-white/72 p-6 shadow-sm">
+          <h3 class="font-serif text-2xl text-[#17312a]">料金と無料の目安</h3>
+          <p class="mt-3 text-sm text-[#60716a]">千波湖西駐車場は平日原則無料、土日祝・指定日は普通車500円／回。詳しい条件や台数は駐車場ガイドでまとめています。</p>
+          <a href="/parking/" class="btn-secondary mt-6">駐車場ガイドを見る</a>
+        </article>
+        <article class="rounded-3xl bg-[#17312a] p-6 text-white shadow-sm">
+          <h3 class="font-serif text-2xl">混雑時に備えて</h3>
+          <p class="mt-3 text-sm text-white/70">桜や梅の季節、週末、イベント時は満車になりやすいです。早めの到着や公共交通の組み合わせがおすすめです。</p>
+          <a href="/walking-course/" class="btn-primary mt-6 !bg-white !text-[#17312a]">一周コースを見る</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="container-page grid gap-10 lg:grid-cols-[.7fr_1.3fr]">
+      <div><span class="section-kicker">よくある質問</span><h2 class="section-title">アクセスの<br />よくある質問</h2></div>
+      <FaqList items={faqItems} />
+    </div>
+  </section>
+</SubpageLayout>

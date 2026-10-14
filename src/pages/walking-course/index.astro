@@ -1,0 +1,117 @@
+---
+import SubpageLayout from '../../layouts/SubpageLayout.astro';
+import FaqList from '../../components/FaqList.astro';
+import { facts } from '../../data/site';
+
+export const prerender = true;
+
+const title = '千波湖一周は何km？徒歩の所要時間・散歩コースを解説';
+const description = '千波湖は周囲約3km。一周の目安は徒歩約35〜40分、景色を楽しみながら休憩を含めると45〜70分。ジョギングなら15〜20分、自転車なら約10分。舗装された周回路でベビーカーや車いすでも周回しやすいコースを解説します。';
+const breadcrumbs = [{ name: '一周コース', href: '/walking-course/' }];
+
+const faqItems = [
+  {
+    question: '千波湖一周は何kmですか？',
+    answer: '千波湖の周囲は約3kmです。水戸市の公式案内でも湖の周りが約3.0kmと紹介されています。',
+  },
+  {
+    question: '千波湖一周に何分かかりますか？',
+    answer: '歩く速さにもよりますが、約35〜40分で一周できます。景色を眺めながら休憩を挟むと45〜70分程度になります。休憩回数やペースで所要時間は変わります。',
+  },
+  {
+    question: 'ベビーカーや車いすで周れますか？',
+    answer: '周囲は舗装された周回路になっているため、ベビーカーや車いすでも周回しやすいつくりです。ただし混雑時やイベント時は譲り合いにご協力ください。',
+  },
+  {
+    question: '自転車で一周できますか？',
+    answer: '自転車なら約10分程度が目安です。園内では歩行者やランナーに配慮し、安全に走行してください。',
+  },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+---
+<SubpageLayout title={title} description={description} breadcrumbs={breadcrumbs} structuredData={[faqSchema]}>
+  <section class="relative overflow-hidden bg-[#17312a] text-white">
+    <div class="container-page py-16 sm:py-20">
+      <div class="max-w-3xl reveal">
+        <span class="section-kicker !text-[#bcd3c8]">一周コース</span>
+        <h1 class="mt-4 font-serif text-[clamp(2.2rem,6vw,4rem)] leading-[1.05] tracking-[-.03em]">千波湖一周は<br />何km？</h1>
+        <p class="mt-5 text-base leading-8 text-white/76 sm:text-lg">「千波湖 一周 何km」「千波湖一周 何分」で調べる方へ。湖畔をぐるりと回る約3kmの散歩コースの距離と所要時間、見どころをまとめました。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="container-page">
+      <div class="mb-10"><span class="section-kicker">千波湖一周の目安</span><h2 class="section-title">距離と、<br />所要時間。</h2></div>
+      <div class="grid gap-5 lg:grid-cols-12">
+        <article class="surface p-7 sm:p-9 lg:col-span-7">
+          <p class="text-xs font-extrabold tracking-[.15em] text-[#6c8177]">周回の目安</p>
+          <dl class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div class="rounded-2xl bg-white/60 p-4"><dt class="text-xs text-[#8a988f]">距離</dt><dd class="mt-1 font-serif text-2xl text-[#17312a]">約3km</dd></div>
+            <div class="rounded-2xl bg-white/60 p-4"><dt class="text-xs text-[#8a988f]">徒歩</dt><dd class="mt-1 font-serif text-2xl text-[#17312a]">約35〜40分</dd></div>
+            <div class="rounded-2xl bg-white/60 p-4"><dt class="text-xs text-[#8a988f]">ジョギング</dt><dd class="mt-1 font-serif text-2xl text-[#17312a]">約15〜20分</dd></div>
+            <div class="rounded-2xl bg-white/60 p-4"><dt class="text-xs text-[#8a988f]">自転車</dt><dd class="mt-1 font-serif text-2xl text-[#17312a]">約10分</dd></div>
+          </dl>
+          <p class="mt-5 text-sm text-[#60716a]">景色を眺めながらゆっくり歩くなら45〜70分ほど。半周でも十分に水辺の空気を味わえます。歩く速さや休憩回数によって所要時間は変わります。</p>
+        </article>
+        <article class="rounded-[1.6rem] bg-[#17312a] p-7 text-white sm:p-9 lg:col-span-5">
+          <p class="text-xs font-extrabold tracking-[.15em] text-white/50">一周の見どころ</p>
+          <ul class="mt-5 space-y-3 text-sm text-white/78">
+            <li>・白鳥・黒鳥の観察スポット</li>
+            <li>・スワンボート乗り場（季節運航）</li>
+            <li>・好文カフェで湖を眺める休憩</li>
+            <li>・桜並木と湖上噴水の景色</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell bg-[#e9f0ea]">
+    <div class="container-page">
+      <div class="mb-10 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+        <div><span class="section-kicker">コースの特徴</span><h2 class="section-title">だれでも、<br />周りやすい道。</h2></div>
+        <p class="section-lead">千波湖の周囲は舗装された周回路になっているため、ベビーカーや車いすでも周回しやすく、ペースに合わせて選べます。ランナーや自転車との譲り合いだけ気をつければ、気軽に楽しめます。</p>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <article class="rounded-3xl bg-white/72 p-6 shadow-sm"><h3 class="font-serif text-xl text-[#17312a]">舗装された周回路</h3><p class="mt-3 text-sm text-[#60716a]">足元が整っているため、歩きやすい靴があれば小さなお子様連れでも安心です。</p></article>
+        <article class="rounded-3xl bg-white/72 p-6 shadow-sm"><h3 class="font-serif text-xl text-[#17312a]">半周でも満足</h3><p class="mt-3 text-sm text-[#60716a]">時間がない日は水戸駅側から入って景色のよい区間を往復するだけでも十分楽しめます。</p></article>
+        <article class="rounded-3xl bg-[#17312a] p-6 text-white shadow-sm"><h3 class="font-serif text-xl">朝の静けさ</h3><p class="mt-3 text-sm text-white/70">人が少ない早朝は湖面の反射や鳥の観察に向いています。写真を撮る方にもおすすめ。</p></article>
+        <article class="rounded-3xl bg-[#17312a] p-6 text-white shadow-sm"><h3 class="font-serif text-xl">夕方の湖面</h3><p class="mt-3 text-sm text-white/70">散歩の終盤を日没前に合わせると、湖面の色が変わる時間をゆっくり過ごせます。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell">
+    <div class="container-page">
+      <div class="grid gap-10 lg:grid-cols-[.7fr_1.3fr]">
+        <div><span class="section-kicker">よくある質問</span><h2 class="section-title">一周コースの<br />よくある質問</h2></div>
+        <FaqList items={faqItems} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section-shell bg-[#e9f0ea]">
+    <div class="container-page">
+      <div class="mb-8"><span class="section-kicker">出典・資料來源</span><h2 class="section-title">資料來源</h2></div>
+      <ul class="space-y-4">
+        <li class="surface flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="font-bold">水戸市公式（千波公園の紹介）</p>
+            <p class="mt-1 text-sm text-[#62736d]">湖の周囲が約3.0kmであることが案内されています。</p>
+          </div>
+          <a href="https://www.city.mito.lg.jp/page/4710.html" target="_blank" rel="noopener noreferrer" class="btn-secondary shrink-0">水戸市公式サイト ↗</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</SubpageLayout>
